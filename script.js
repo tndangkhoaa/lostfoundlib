@@ -1,12 +1,30 @@
+// Kết nối với Supabase
 const SUPABASE_URL = 'https://nrsksqrofooddfsiavot.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yc2tzcXJvZm9vZGRmc2lhdm90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcwMjc3NjgsImV4cCI6MjA2MjYwMzc2OH0.nMWFx8T4r3o5Nu1RfuX07KhpAOlaoj9QQRxTMv9x-8o';
-
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. DOM Elements
 const form = document.getElementById("report-form");
 const itemsList = document.getElementById("items-list");
+
+// Hàm tải ảnh lên Supabase Storage
+async function uploadImage(file) {
+    const fileName = Date.now() + "_" + encodeURIComponent(file.name); // Mã hóa URL tên tệp để xử lý ký tự đặc biệt
+    const { data, error } = await supabaseClient
+        .storage
+        .from('images')  // Bucket 'images'
+        .upload(fileName, file);
+
+    if (error) {
+        console.error("Lỗi tải ảnh:", error.message);
+        return null;
+    }
+
+    // Lấy URL của ảnh đã tải lên
+    const imageUrl = `https://nrsksqrofooddfsiavot.supabase.co/storage/v1/object/public/images/${data.path}`; // Sử dụng data.path thay vì data.Key
+    return imageUrl;
+}
 
 // 3. Xử lý Submit Form
 form?.addEventListener("submit", async (e) => {
@@ -18,7 +36,7 @@ form?.addEventListener("submit", async (e) => {
         description: document.getElementById("description").value,
         location_found: document.getElementById("location").value,
         contact_email: document.getElementById("email").value,
-        image_url: document.getElementById("image").value,
+        image_url: document.getElementById("image").files[0] ? await uploadImage(document.getElementById("image").files[0]) : null,
         status: "Chưa nhận", // Trạng thái mặc định
         date_reported: new Date().toISOString() // Thêm ngày giờ hiện tại vào dữ liệu
     };
@@ -74,6 +92,7 @@ async function loadItems() {
                     <p><strong>Vị trí:</strong> ${item.location_found || 'Chưa xác định'}</p>
                     <p><strong>Mô tả:</strong> ${item.description || 'Không có mô tả'}</p>
                     <p><strong>Ngày đăng:</strong> ${displayDate}</p>
+                    <!-- Hiển thị ảnh nếu có -->
                     ${item.image_url ? `<img src="${item.image_url}" width="200" style="margin: 10px 0; border-radius: 4px;">` : ''}
                     <p><strong>Liên hệ:</strong> ${item.contact_email || 'Không có'}</p>
                     <p><strong>Trạng thái:</strong> <span style="color: ${item.status === 'Đã nhận' ? 'green' : 'red'}">${item.status || 'Chưa nhận'}</span></p>
