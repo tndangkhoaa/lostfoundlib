@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trang Quản Trị - LFLibrary</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary-color: #4CAF50;
+      --danger-color: #f44336;
+      --bg-color: #f4f6f8;
+      --text-color: #333;
+      --border-radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+    }
+
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .login-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input[type="password"] {
+      padding: 12px;
+      width: 100%;
+      max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    button {
+        
+      padding: 12px 20px;
+      margin-top: 12px;
+      border: none;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button:hover {
+      background-color: #43a047;
+    }
+
+    .error-message {
+      color: var(--danger-color);
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+    
+      padding: 12px;
+      border-bottom: 5px ;
+      text-align: left;
+      border-bottom: none;
+      
+    }
+
+    th {
+      background-color: #e8f5e9;
+    }
+
+    img {
+      max-width: 80px;
+      max-height: 80px;
+      border-radius: 6px;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .status-dropdown {
+      padding: 6px;
+      border-radius: var(--border-radius);
+      border: 1px solid #ccc;
+    }
+
+    .delete-btn {
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      tr {
+        margin-bottom: 20px;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: none;
+      }
+
+      th {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Trang Quản Trị Đồ Thất Lạc</h1>
+
+  <!-- Đăng nhập -->
+  <div class="box login-box" id="login-section">
+    <h2>Đăng nhập quản trị</h2>
+    <input type="password" id="admin-password" placeholder="Nhập mật khẩu admin" />
+    <button onclick="adminLogin()">Đăng nhập</button>
+    <div class="error-message" id="login-error"></div>
+  </div>
+
+  <!-- Quản trị -->
+  <div class="box" id="admin-content" style="display: none;">
+    <h2>Danh sách đồ thất lạc</h2>
+    <table id="admin-items-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tiêu đề</th>
+          <th>Hình ảnh</th>
+          <th>Vị trí</th>
+          <th>Ngày báo cáo</th>
+          <th>Email</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="admin-items-list"></tbody>
+    </table>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
