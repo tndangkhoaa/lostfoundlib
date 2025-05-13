@@ -7,23 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>📦 Lost & Found – Thư viện</h1>
-
-<form id="report-form">
-    <input type="text" id="title" placeholder="Tên đồ vật" required>
-    <input type="text" id="description" placeholder="Mô tả">
-    <input type="text" id="location" placeholder="Nơi nhặt được">
-    <input type="email" id="email" placeholder="Email liên hệ" required>
-    <!-- Thay đổi input kiểu text thành file để người dùng chọn ảnh -->
-    <input type="file" id="image" accept="image/*">
-    <button type="submit">Gửi báo cáo</button>
-</form>
-
-
-  <h2>📋 Danh sách đồ thất lạc</h2>
-  <div id="items-list"></div>
+  <h2>📋 DANH SÁCH ĐỒ THẤT LẠC</h2>
+  <div class="items-container" id="items-list"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="script.js"></script>
 </body>
+<footer>
+    <p><strong>Thông tin liên lạc</strong></p>
+    <p>📍 Trung tâm thông tin, thư viện và bảo tàng Trường Đại học Khoa học Xã hội và Nhân văn TP.HCM</p>
+    <p>📧 Email: <a href="mailto:contact@hcmussh.edu.vn">cilm@hcmussh.edu.vn</a></p>
+    <p>📞 Điện thoại: +84 28 3822 7899</p>
+  </footer>
 </html>
