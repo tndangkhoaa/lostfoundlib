@@ -5,7 +5,62 @@ document.addEventListener("DOMContentLoaded", () => {
   
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-  
+  // 2. DOM Elements
+const form = document.getElementById("report-form");
+const itemsList = document.getElementById("items-list");
+
+// Hàm tải ảnh lên Supabase Storage
+async function uploadImage(file) {
+    const fileName = Date.now() + "_" + encodeURIComponent(file.name); // Mã hóa URL tên tệp để xử lý ký tự đặc biệt
+    const { data, error } = await supabaseClient
+        .storage
+        .from('images')  // Bucket 'images'
+        .upload(fileName, file);
+
+    if (error) {
+        console.error("Lỗi tải ảnh:", error.message);
+        return null;
+    }
+
+    // Lấy URL của ảnh đã tải lên
+    const imageUrl = `https://nrsksqrofooddfsiavot.supabase.co/storage/v1/object/public/images/${data.path}`; // Sử dụng data.path thay vì data.Key
+    return imageUrl;
+}
+
+// 3. Xử lý Submit Form
+form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Lấy giá trị từ form
+    const formData = {
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        location_found: document.getElementById("location").value,
+        contact_email: document.getElementById("email").value,
+        image_url: document.getElementById("image").files[0] ? await uploadImage(document.getElementById("image").files[0]) : null,
+        status: "Chưa nhận", // Trạng thái mặc định
+        date_reported: new Date().toISOString() // Thêm ngày giờ hiện tại vào dữ liệu
+    };
+
+    try {
+        // Thêm dữ liệu vào Supabase
+        const { data, error } = await supabaseClient
+            .from('LFLibrary')
+            .insert([formData])
+            .select();
+
+        if (error) throw error;
+
+        alert("Gửi thành công!");
+        form.reset();
+        await loadItems(); // Tải lại danh sách
+    } catch (error) {
+        console.error("Lỗi khi gửi dữ liệu:", error);
+        alert(`Lỗi: ${error.message}`);
+    }
+});
+
+// 4. Hàm tải danh sách items
     // 2. Mật khẩu admin đơn giản
     const ADMIN_PASSWORD = "admin123";
     // Kiểm tra trạng thái đăng nhập
@@ -56,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Tạo dropdown trạng thái
                 const statusSelect = document.createElement("select");
                 statusSelect.className = "status-dropdown";
-                const statusOptions = ["Chưa nhận", "Đã nhận", "Đã trả lại"];
+                const statusOptions = ["Chưa nhận", "Đã nhận"];
                 statusOptions.forEach(status => {
                     const option = document.createElement("option");
                     option.value = status;
