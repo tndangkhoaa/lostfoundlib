@@ -5,93 +5,90 @@ document.addEventListener("DOMContentLoaded", () => {
   
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-  // 2. DOM Elements
-const form = document.getElementById("report-form");
-const itemsList = document.getElementById("items-list");
 
-// Hàm tải ảnh lên Supabase Storage
-async function uploadImage(file) {
-    const fileName = Date.now() + "_" + encodeURIComponent(file.name); // Mã hóa URL tên tệp để xử lý ký tự đặc biệt
-    const { data, error } = await supabaseClient
-        .storage
-        .from('images')  // Bucket 'images'
-        .upload(fileName, file);
-
-    if (error) {
-        console.error("Lỗi tải ảnh:", error.message);
-        return null;
-    }
-
-    // Lấy URL của ảnh đã tải lên
-    const imageUrl = `https://nrsksqrofooddfsiavot.supabase.co/storage/v1/object/public/images/${data.path}`; // Sử dụng data.path thay vì data.Key
-    return imageUrl;
-}
-
-// 3. Xử lý Submit Form
-form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    // Lấy giá trị từ form
-    const formData = {
-        title: document.getElementById("title").value,
-        description: document.getElementById("description").value,
-        location_found: document.getElementById("location").value,
-        contact_email: document.getElementById("email").value,
-        image_url: document.getElementById("image").files[0] ? await uploadImage(document.getElementById("image").files[0]) : null,
-        status: "Chưa nhận", // Trạng thái mặc định
-        date_reported: new Date().toISOString() // Thêm ngày giờ hiện tại vào dữ liệu
-    };
-
-    try {
-        // Thêm dữ liệu vào Supabase
-        const { data, error } = await supabaseClient
-            .from('LFLibrary')
-            .insert([formData])
-            .select();
-
-        if (error) throw error;
-
-        alert("Gửi thành công!");
-        form.reset();
-        await loadItems(); // Tải lại danh sách
-    } catch (error) {
-        console.error("Lỗi khi gửi dữ liệu:", error);
-        alert(`Lỗi: ${error.message}`);
-    }
-});
-
-// 4. Hàm tải danh sách items
-    // 2. Mật khẩu admin đơn giản
-    const ADMIN_PASSWORD = "admin123";
     // Kiểm tra trạng thái đăng nhập
-    if (localStorage.getItem("isAdminLoggedIn") === "true") {
-        showAdminContent();
-    }
-  
-    // Đăng nhập
-    window.adminLogin = function () {
-        const password = document.getElementById("admin-password").value;
-        if (password === ADMIN_PASSWORD) {
-            localStorage.setItem("isAdminLoggedIn", "true");
+    checkLoginStatus();
+
+    // 2. Hàm kiểm tra đăng nhập
+    function checkLoginStatus() {
+        if (localStorage.getItem("isAdminLoggedIn") === "true") {
             showAdminContent();
         } else {
-            alert("❌ Mật khẩu không đúng!");
+            showUnauthorizedMessage();
         }
-    };
-  
-    // Hiển thị trang admin
+    }
+
+    // Hiển thị nội dung trang admin khi đã đăng nhập
     function showAdminContent() {
-        document.getElementById("login-section").style.display = "none";
+        document.getElementById("unauthorized-section").style.display = "none";
         document.getElementById("admin-content").style.display = "block";
         loadAdminItems();
     }
-  
+
+    // Hiển thị thông báo không có quyền truy cập
+    function showUnauthorizedMessage() {
+        document.getElementById("unauthorized-section").style.display = "block";
+        document.getElementById("admin-content").style.display = "none";
+    }
+
     // Đăng xuất
     window.logoutAdmin = function () {
         localStorage.removeItem("isAdminLoggedIn");
         location.reload();
     };
-  
+
+    // Hàm tải ảnh lên Supabase Storage
+    async function uploadImage(file) {
+        const fileName = Date.now() + "_" + encodeURIComponent(file.name); // Mã hóa URL tên tệp để xử lý ký tự đặc biệt
+        const { data, error } = await supabaseClient
+            .storage
+            .from('images')  // Bucket 'images'
+            .upload(fileName, file);
+
+        if (error) {
+            console.error("Lỗi tải ảnh:", error.message);
+            return null;
+        }
+
+        // Lấy URL của ảnh đã tải lên
+        const imageUrl = `https://nrsksqrofooddfsiavot.supabase.co/storage/v1/object/public/images/${data.path}`; // Sử dụng data.path thay vì data.Key
+        return imageUrl;
+    }
+
+    // 3. Xử lý Submit Form
+    const form = document.getElementById("report-form");
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Lấy giá trị từ form
+        const formData = {
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            location_found: document.getElementById("location").value,
+            contact_email: document.getElementById("email").value,
+            image_url: document.getElementById("image").files[0] ? await uploadImage(document.getElementById("image").files[0]) : null,
+            status: "Chưa nhận", // Trạng thái mặc định
+            date_reported: new Date().toISOString() // Thêm ngày giờ hiện tại vào dữ liệu
+        };
+
+        try {
+            // Thêm dữ liệu vào Supabase
+            const { data, error } = await supabaseClient
+                .from('LFLibrary')
+                .insert([formData])
+                .select();
+
+            if (error) throw error;
+
+            alert("Gửi thành công!");
+            form.reset();
+            await loadAdminItems(); // Sửa đổi: gọi loadAdminItems thay vì loadItems
+        } catch (error) {
+            console.error("Lỗi khi gửi dữ liệu:", error);
+            alert(`Lỗi: ${error.message}`);
+        }
+    });
+
     // Tải dữ liệu từ Supabase
     async function loadAdminItems() {
         try {
@@ -132,14 +129,14 @@ form?.addEventListener("submit", async (e) => {
 
                 // Tạo hàng dữ liệu
                 row.innerHTML = `
-                  <td>${item.id.slice(0, 5)}...</td>
-                  <td>${item.title || 'Không có tiêu đề'}</td>
-                  <td>${item.image_url ? `<img src="${item.image_url}" alt="Ảnh" style="max-width:60px; border-radius:4px;">` : 'Không có'}</td>
-                  <td>${item.location_found || 'Không rõ'}</td>
-                  <td>${formattedDate}</td>
-                  <td>${item.contact_email || 'Không có'}</td>
-                  <td class="status-cell"></td>
-                  <td class="action-btns"></td>
+                    <td>${item.id.slice(0, 5)}...</td>
+                    <td>${item.title || 'Không có tiêu đề'}</td>
+                    <td>${item.image_url ? `<img src="${item.image_url}" alt="Ảnh" style="max-width:60px; border-radius:4px;">` : 'Không có'}</td>
+                    <td>${item.location_found || 'Không rõ'}</td>
+                    <td>${formattedDate}</td>
+                    <td>${item.contact_email || 'Không có'}</td>
+                    <td class="status-cell"></td>
+                    <td class="action-btns"></td>
                 `;
   
                 row.querySelector(".status-cell").appendChild(statusSelect);

@@ -3,6 +3,7 @@
   --secondary-color: #f4f4f4;
   --text-color: #333;
   --error-color: #ff4747;
+  --success-color: #10b981;
   --bg-color: #e9eff1;
   --border-radius: 12px;
   --shadow-color: rgba(0, 0, 0, 0.1);
@@ -23,7 +24,7 @@ body {
 }
 
 /* Container chính */
-.login-wrapper {
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,11 +42,16 @@ body {
   max-width: 400px;
   text-align: center;
   box-sizing: border-box;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.login-box:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
 }
 
 /* Tiêu đề */
-.login-box h1 {
+.login-box h2 {
   font-size: 28px;
   color: var(--primary-color);
   margin-bottom: 30px;
@@ -92,16 +98,19 @@ button:hover {
   transform: translateY(-2px);
 }
 
-/* Thông báo lỗi */
+/* Thông báo lỗi/thành công */
 .error-message {
-  color: var(--error-color);
   font-size: 14px;
-  margin-top: 10px;
+  margin-top: 15px;
+  min-height: 20px;
+  transition: color 0.3s ease;
 }
 
-/* Hiệu ứng khi hover vào hộp đăng nhập */
-.login-box:hover {
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+/* Thông tin bổ sung */
+.info-text {
+  color: #666;
+  font-size: 14px;
+  margin-top: 20px;
 }
 
 /* Responsive cho mobile */
@@ -111,7 +120,7 @@ button:hover {
     width: 90%;
   }
 
-  .login-box h1 {
+  .login-box h2 {
     font-size: 24px;
   }
 

@@ -16,11 +16,17 @@
         <button type="submit">Đăng nhập</button>
       </form>
       <div class="error-message" id="login-error"></div>
+      <p class="info-text">Đăng nhập để quản lý đồ thất lạc</p>
     </div>
   </div>
  <script>
     // Mật khẩu quản trị
     const ADMIN_PASSWORD = "admin123";
+
+    // Kiểm tra nếu đã đăng nhập thì chuyển hướng ngay
+    if (localStorage.getItem("isAdminLoggedIn") === "true") {
+      window.location.href = "admin.html";
+    }
 
     // Lấy các phần tử DOM
     const loginForm = document.getElementById("login-form");
@@ -38,12 +44,22 @@
         // Lưu trạng thái đăng nhập
         localStorage.setItem("isAdminLoggedIn", "true");
 
-        // Chuyển hướng đến trang admin
-        window.location.href = "admin.html";
+        // Thông báo đăng nhập thành công
+        errorMessage.textContent = "✅ Đăng nhập thành công! Đang chuyển hướng...";
+        errorMessage.style.color = "green";
+
+        // Chuyển hướng đến trang admin sau 1 giây
+        setTimeout(() => {
+          window.location.href = "admin.html";
+        }, 1000);
       } else {
         // Hiển thị thông báo lỗi
         errorMessage.textContent = "❌ Mật khẩu không đúng!";
         errorMessage.style.color = "red";
+        
+        // Xóa mật khẩu đã nhập
+        passwordInput.value = "";
+        passwordInput.focus();
       }
     });
   </script>
